@@ -1,9 +1,11 @@
-const functions = require('firebase-functions');
-const Discord = require('discord.js');
-const axios = require('axios');
-const admin = require('firebase-admin');
-admin.initializeApp();
-const slugs = require('./constants');
+const functions = require("firebase-functions");
+const Discord = require("discord.js");
+const axios = require("axios");
+const admin = require("firebase-admin");
+admin.initializeApp({
+	credential: admin.credential.applicationDefault(),
+});
+const slugs = require("./constants");
 
 exports.dailycc = functions.https.onRequest(() => {
 	const client = new Discord.Client();
@@ -11,20 +13,20 @@ exports.dailycc = functions.https.onRequest(() => {
 
 	client.login(access_token).catch((err) => console.log(err));
 
-	client.on('ready', () => {
+	client.on("ready", () => {
 		const slug = slugs[Math.round(Math.random() * slugs.length - 1)];
-		postQuestion(slug, client.channels.cache.get('771821709589479505'));
+		postQuestion(slug, client.channels.cache.get("771821709589479505"));
 	});
 
 	const postQuestion = async (slug, channel) => {
 		const result = await getQuestion(slug);
 
-		if (result === 'Not Found') {
+		if (result === "Not Found") {
 			channel.send(`No coding problem today. Check back tomorrow 😁`);
 			return;
 		} else {
 			channel.send(result).catch((err) => {
-				channel.send('There was an issue grabbing the question');
+				channel.send("There was an issue grabbing the question");
 				channel.send(`Error: ${err.message}`);
 			});
 		}
@@ -36,6 +38,50 @@ exports.dailycc = functions.https.onRequest(() => {
 				`https://www.codewars.com/api/v1/code-challenges/${slug}`
 			);
 			return data.url;
+		} catch ({ response }) {
+			return response.statusText;
+		}
+	};
+});
+
+exports.affirmations = functions.https.onRequest((req, res) => {
+	const client = new Discord.Client();
+	const { access_token } = functions.config().discord;
+
+	client.login(access_token).catch((err) => console.log(err));
+
+	client.on("ready", async () => {
+		postAffirmation(client.channels.cache.get("771821709589479505"));
+	});
+
+	const postAffirmation = async (channel) => {
+		const result = await getAffirmation();
+
+		if (result === null || result === undefined) {
+			channel.send(`Cheers to a new week 😁`);
+			return;
+		} else {
+			channel.send(result).catch((err) => {
+				channel.send("There was an issue grabbing the affirmation");
+				channel.send(`Error: ${err.message}`);
+			});
+		}
+	};
+
+	const getAffirmation = async () => {
+		try {
+			const { affirmation } = await admin
+				.firestore()
+				.collection("constants")
+				.doc("affirmations")
+				.get()
+				.then((res) => {
+					console.log(res.data());
+					return res;
+				})
+				.catch((err) => res.send(err));
+			res.send(affirmation);
+			return affirmation;
 		} catch ({ response }) {
 			return response.statusText;
 		}
