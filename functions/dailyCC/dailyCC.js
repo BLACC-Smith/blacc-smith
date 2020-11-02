@@ -4,66 +4,56 @@ const {randomIndex, removeFromList} = require('../utilities')
 
 const getQuestion = async (slug)=>{
 	let url = baseUrl + '/' + slug
-	let resp
 	try{
-		resp = await axios.get(url)
+		let resp = await axios.get(url)
+		return resp.data
 	}
 	catch(err){
 		throw err
 	}
-
-	return resp.data
 }
 
 
 const getUsedSlugs = async (firestore)=>{
-	let snapshot
 	try{
-		snapshot = await firestore.collection('dailyCC').doc('slugs').get();
+		let snapshot = await firestore.collection('dailyCC').doc('slugs').get();
+		if(snapshot.exists){
+			let slugs = snapshot.data()
+			return slugs.usedSlugs
+		}
+		else {
+			throw 'Snapshot does not existt'
+		}
 	}
 	catch(err){
 		throw err
 	}
 
-	if(snapshot.exists){
-		let slugs = snapshot.data()
-		return slugs.usedSlugs
-	}
-	else {
-		throw 'Snapshot does not existt'
-	}
 }
 
 const getPossibleSlugs = async({firestore, ignoreList=[]})=>{
-	let snapshot
 	try{
-		snapshot = await firestore.collection('dailyCC').doc('slugs').get();
+		let snapshot = await firestore.collection('dailyCC').doc('slugs').get();
+
+		if(snapshot.exists){
+			let slugs = snapshot.data()
+			return removeFromList(slugs.allSlugs, ignoreList)
+		}
+		else {
+			throw 'Snapshot does not existt'
+		}
 	}
 	catch(err){
 		throw err
 	}
 
-	if(snapshot.exists){
-		let slugs = snapshot.data()
-		return removeFromList(slugs.allSlugs, ignoreList)
-	}
-	else {
-		throw 'Snapshot does not existt'
-	}
 }
 
 const addToUsedSlugs = async ({firestore, slug})=>{
-	let usedSlugs
 	try{
-		usedSlugs = await getUsedSlugs(firestore)
-	}
-	catch(err){
-		throw err
-	}
+		let usedSlugs = await getUsedSlugs(firestore)
+		usedSlugs.push(slug)
 
-	usedSlugs.push(slug)
-
-	try{
 		await firestore
 		.collection('dailyCC')
 		.doc('slugs')
@@ -78,52 +68,27 @@ const addToUsedSlugs = async ({firestore, slug})=>{
 
 //TODO error handling
 const handleDailyCC = async({channel, firestore})=>{
-	//Retrieve list of used slugs
-	let usedSlugList
 	try{
-		usedSlugList = await getUsedSlugs(firestore)
-	}
-	catch(err){
-		throw err
-	}
+		//Retrieve list of used slugs
+		let usedSlugList = await getUsedSlugs(firestore)
 
-	//get list of unused slugs
-	let unusedSlugs
-	try {
-		unusedSlugs = await getPossibleSlugs({firestore, ignoreList: usedSlugList})
-	}
-	catch(err){
-		throw err
-	}
+		//get list of unused slugs
+		let unusedSlugs = await getPossibleSlugs({firestore, ignoreList: usedSlugList})
 
-	//TODO handle when there are no more unused slugs
+		//TODO handle when there are no more unused slugs
 
-	//Retrieve a random slug from the unused list
-	let index = randomIndex(unusedSlugs.length-1)
-	console.log(unusedSlugs.length)
-	let slug = unusedSlugs[index]
+		//Retrieve a random slug from the unused list
+		let index = randomIndex(unusedSlugs.length-1)
+		let slug = unusedSlugs[index]
 
-	//Retrieve question based on the slug
-	let question
-	try{
-		question = await getQuestion(slug)
-	}
-	catch(err){
-		throw err
-	}
+		//Retrieve question based on the slug
+		let question = await getQuestion(slug)
 
-	//Post the question
-	try{
+		//Post the question
 		await channel.send(question.url)
-	}
-	catch(err){
-		throw err
-	}
 
-	//Update the used slugs list
-	let newUsedSlugs
-	try{
-		newUsedSlugs = await addToUsedSlugs({firestore, slug: slug})
+		//Update the used slugs list
+		await addToUsedSlugs({firestore, slug: slug})
 	}
 	catch(err){
 		throw err

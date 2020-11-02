@@ -1,15 +1,4 @@
 
-exports.randomIndex = (maxIndex)=>{
-	return Math.round(Math.random() * maxIndex);
-}
+exports.randomIndex = (maxIndex)=>Math.round(Math.random() * maxIndex)
 
-exports.removeFromList = (list, itemsToRemove)=>{
-	let newList = [...list]
-
-	itemsToRemove.forEach((item)=>{
-		let index = list.indexOf(item)
-		newList.splice(index, 1)
-	})
-
-	return newList
-}
+exports.removeFromList = (list, itemsToRemove)=>list.filter(item => !itemsToRemove.includes(item))
