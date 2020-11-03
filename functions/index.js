@@ -44,7 +44,7 @@ exports.dailycc = functions.https.onRequest(() => {
 	};
 });
 
-exports.affirmations = functions.https.onRequest((req, res) => {
+exports.affirmations = functions.https.onRequest((request, response) => {
 	const client = new Discord.Client();
 	const { access_token } = functions.config().discord;
 
@@ -55,35 +55,41 @@ exports.affirmations = functions.https.onRequest((req, res) => {
 	});
 
 	const postAffirmation = async (channel) => {
-		const result = await getAffirmation();
+		var affirmation = [];
+		const result = await getAffirmation((data) => {
+			affirmation = data;
+		});
 
-		if (result === null || result === undefined) {
+		if (
+			affirmation === null ||
+			affirmation === undefined ||
+			affirmation.length === 0
+		) {
 			channel.send(`Cheers to a new week 😁`);
-			return;
 		} else {
-			channel.send(result).catch((err) => {
+			channel.send(affirmation).catch((err) => {
 				channel.send("There was an issue grabbing the affirmation");
 				channel.send(`Error: ${err.message}`);
 			});
-		}
+		}	
 	};
 
-	const getAffirmation = async () => {
+	const getAffirmation = async (callback) => {
 		try {
-			const { affirmation } = await admin
+			return await admin
 				.firestore()
 				.collection("constants")
 				.doc("affirmations")
 				.get()
 				.then((res) => {
-					console.log(res.data());
-					return res;
+					if(callback) callback(res.data())
+					response.send(res.data());
 				})
 				.catch((err) => res.send(err));
-			res.send(affirmation);
-			return affirmation;
 		} catch ({ response }) {
-			return response.statusText;
+			console.log("error!");
+			console.log({ response });
+			return response;
 		}
 	};
 });
