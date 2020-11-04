@@ -4,7 +4,7 @@ const { randomIndex } = require('../utilities');
 module.exports = async () => {
 	const affirmations = await getAffirmation();
 	const { quote, author } = affirmations[randomIndex(affirmations.length - 1)];
-	return `${quote}${!author ? '' : ` - ${author}`}`;
+	return !author ? quote : `${quote} - ${author}`;
 };
 
 const getAffirmation = async () => {
