@@ -1,4 +1,5 @@
-module.exports = slugs = [
+exports.testChannel = '771821709589479505';
+exports.slugs = [
 	'tiny-three-pass-compiler',
 	'6-by-6-skyscrapers',
 	'mystery-function-number-2',
