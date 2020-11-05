@@ -5,46 +5,24 @@ const { testChannel } = require('./constants');
 const postAffirmation = require('./affirmations');
 
 exports.dailycc = functions.https.onRequest(async (req, res) => {
-	console.log({ testChannel });
-	firestore
-		.collection('dailyCC')
-		.doc('gt-test')
-		.set({ status: 'Success' })
-		.then(() => {
-			discordClient.channels.cache.get(testChannel).send('Config file works');
-			res.send('Hit firestore successfully');
-		});
-	// const client = new Discord.Client();
-	// const { access_token } = functions.config().discord;
-	// client.login(access_token).catch((err) => console.log(err));
-	// client.on("ready", () => {
-	// 	const slug = slugs[Math.round(Math.random() * slugs.length - 1)];
-	// 	postQuestion(slug, client.channels.cache.get("771821709589479505"));
-	// });
-	// const postQuestion = async (slug, channel) => {
-	// 	const result = await getQuestion(slug);
-	// 	if (result === "Not Found") {
-	// 		channel.send(`No coding problem today. Check back tomorrow 😁`);
-	// 		return;
-	// 	} else {
-	// 		channel.send(result).catch((err) => {
-	// 			channel.send("There was an issue grabbing the question");
-	// 			channel.send(`Error: ${err.message}`);
-	// 		});
-	// 	}
-	// };
-	// const getQuestion = async (slug) => {
-	// 	try {
-	// 		const { data } = await axios.get(
-	// 			`https://www.codewars.com/api/v1/code-challenges/${slug}`
-	// 		);
-	// 		return data.url;
-	// 	} catch ({ response }) {
-	// 		return response.statusText;
-	// 	}
-	// };
-});
+	const discordClient = new Discord.Client();
+	const { access_token } = functions.config().discord;
+	const firestore = admin.firestore();
 
+	discordClient.login(access_token).catch((err) => console.log(err));
+
+	discordClient.on('ready', async () => {
+		const channelId = "771821709589479505"
+		const channel = discordClient.channels.cache.get(channelId);
+
+		let question
+		try{
+			question = await handleDailyCC({channel, firestore})
+		}
+		catch(err){
+			console.log('ERROR', err)
+			res.send(err)
+			return
 exports.affirmations = functions.https.onRequest((req, res) => {
 	discordClient.on('ready', async () => {
 		try {
@@ -56,5 +34,8 @@ exports.affirmations = functions.https.onRequest((req, res) => {
 		} catch (error) {
 			throw error;
 		}
+		console.log('POSTED: ' + question)
+		res.send(question)
+	});
 	});
 });
