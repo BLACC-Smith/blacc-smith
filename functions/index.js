@@ -1,7 +1,7 @@
 const functions = require('firebase-functions');
 const axios = require('axios');
 const { firestore, discordClient } = require('./config');
-const { testChannel } = require('./constants');
+const { affirmationsChannel } = require('./constants');
 const postAffirmation = require('./affirmations');
 
 exports.dailycc = functions.https.onRequest(async (req, res) => {
@@ -48,10 +48,10 @@ exports.dailycc = functions.https.onRequest(async (req, res) => {
 exports.affirmations = functions.https.onRequest((req, res) => {
 	discordClient.on('ready', async () => {
 		try {
-			const quote = await postAffirmation();
-			if (quote) {
-				discordClient.channels.cache.get(testChannel).send(quote);
-				res.send(quote);
+			const message = await postAffirmation();
+			if (message) {
+				discordClient.channels.cache.get(affirmationsChannel).send(message);
+				res.send(message);
 			} else res.send('Cannot retrieve data');
 		} catch (error) {
 			throw error;
