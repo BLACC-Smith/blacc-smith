@@ -49,10 +49,12 @@ exports.affirmations = functions.https.onRequest((req, res) => {
 	discordClient.on('ready', async () => {
 		try {
 			const message = await postAffirmation();
-			if (message) {
-				discordClient.channels.cache.get(affirmationsChannel).send(message);
-				res.send(message);
-			} else res.send('Cannot retrieve data');
+			if (!message) {
+				res.send('Cannot retrieve data');
+				return;
+			}
+			discordClient.channels.cache.get(affirmationsChannel).send(message);
+			res.send(message);
 		} catch (error) {
 			throw error;
 		}
