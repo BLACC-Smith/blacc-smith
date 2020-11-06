@@ -21,7 +21,7 @@ const getUsedSlugs = async () => {
 	}
 };
 
-const addToUsedSlugs = async (slug) => {
+const updateFirebaseSlugs = async (slug) => {
 	try {
 		let usedSlugs = await getUsedSlugs(firestore);
 		usedSlugs.push(slug);
@@ -33,7 +33,7 @@ const addToUsedSlugs = async (slug) => {
 
 		return usedSlugs;
 	} catch (err) {
-		console.log({ addToUsedSlugs: err });
+		console.log({ updateFirebaseSlugs: err });
 	}
 };
 const embedMessage = ({ url, description, name, category, rank }) => {
@@ -56,25 +56,17 @@ const embedMessage = ({ url, description, name, category, rank }) => {
 		.setTimestamp();
 };
 
-//TODO error handling
+const getUnusedSlug = async () => {
+	const usedSlugs = await getUsedSlugs();
+	const slug = slugs[randomIndex(slugs.length - 1)];
+	return !usedSlugs.includes(slug) ? slug : getUnusedSlug();
+};
+
 const handleDailyCC = async () => {
 	try {
-		const usedSlugs = await getUsedSlugs();
-		let slug,
-			hasSlugBeenUsed = true;
-		// Get an unused random slug
-		while (hasSlugBeenUsed) {
-			slug = slugs[randomIndex(slugs.length - 1)];
-			hasSlugBeenUsed = usedSlugs.includes(slug);
-		}
-		// get challenge
+		const slug = await getUnusedSlug();
 		const question = await getQuestion(slug);
-		console.log({ question });
-
-		// update firebase
-		await addToUsedSlugs(slug);
-
-		// embed message
+		await updateFirebaseSlugs(slug);
 		return embedMessage(question);
 	} catch (err) {
 		console.log({ handleDailyCC: err });
@@ -82,11 +74,7 @@ const handleDailyCC = async () => {
 };
 
 const resetDailyCCData = async () => {
-	let config = {
-		usedSlugs: [],
-		allSlugs: slugs,
-	};
-
+	let config = { usedSlugs: [] };
 	try {
 		await firestore.collection('dailyCC').doc('slugs').set(config);
 		return config;
@@ -96,6 +84,6 @@ const resetDailyCCData = async () => {
 };
 
 exports.resetDailyCCData = resetDailyCCData;
-exports.addToUsedSlugs = addToUsedSlugs;
+exports.updateFirebaseSlugs = updateFirebaseSlugs;
 exports.getUsedSlugs = getUsedSlugs;
 exports.handleDailyCC = handleDailyCC;
