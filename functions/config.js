@@ -14,3 +14,4 @@ discordClient.login(access_token).catch((err) => console.log(err));
 
 exports.firestore = admin.firestore();
 exports.discordClient = discordClient;
+exports.discordMessageEmbed = new Discord.MessageEmbed();
