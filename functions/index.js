@@ -1,8 +1,8 @@
 const functions = require('firebase-functions');
-const { discordClient } = require('./config');
+const { discordClient, discordGuilds } = require('./config');
 const { affirmationsChannel, blaccSmithServer } = require('./constants');
 const postAffirmation = require('./affirmations');
-const { askAnonymously } = require('./afaf');
+const { askAnonymously, getChannel } = require('./afaf');
 
 exports.dailycc = functions.https.onRequest(async (req, res) => {
 	const discordClient = new Discord.Client();
@@ -45,21 +45,10 @@ exports.affirmations = functions.https.onRequest((req, res) => {
 });
 
 discordClient.on('message', async ({ content, channel, author }) => {
-	const channels = discordClient.guilds.cache.get(blaccSmithServer).channels
-		.cache;
+	const channels = discordGuilds.get(blaccSmithServer).channels.cache;
 	if (author.bot) return;
-
 	if (channel.type === 'dm' && content.toLowerCase().startsWith('ask')) {
-		channel.send('Where should your question be asked? `Ex: #general`');
-		const replies = await channel.awaitMessages(
-			(message) => message.author.id == author.id,
-			{ max: 1 }
-		);
-		const reply = replies.array()[0].content;
-		const { id } = channels
-			.array()
-			.find((item) => item.name === reply.slice(1));
-
-		askAnonymously(content.slice(3).trim(), id, discordClient);
+		const preferredChannelId = await getChannel(author, channel, channels);
+		askAnonymously(content.slice(3).trim(), preferredChannelId, discordClient);
 	}
 });
