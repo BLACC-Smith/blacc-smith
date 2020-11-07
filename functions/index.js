@@ -2,7 +2,8 @@ const functions = require('firebase-functions');
 const { discordClient } = require('./config');
 const { affirmationsChannel } = require('./constants');
 const postAffirmation = require('./affirmations');
-const { handleNewRequest } = require('./githubRequests');
+const { handleNewIssue } = require('./githubRequests');
+const { access_token } = functions.config().github;
 
 exports.dailycc = functions.https.onRequest(async (req, res) => {
 	const discordClient = new Discord.Client();
@@ -43,10 +44,18 @@ exports.affirmations = functions.https.onRequest((req, res) => {
 	});
 });
 
-discordClient.on('message', ({ content, channel, author }) => {
+discordClient.on('message', async ({ content, channel, author }) => {
 	if (author.bot) return;
-	if (content.startsWith('Feature:')) {
-		const res = handleNewRequest(content.split('Feature:')[1].trim());
-		channel.send(res);
+	try {
+		if (content.toLowerCase().startsWith('feature:')) {
+			const newIssue = await handleNewIssue({
+				channel,
+				issue: content.slice(8).trim(),
+				access_token,
+			});
+			channel.send(newIssue);
+		}
+	} catch (error) {
+		throw { onHandleNewIssue: error };
 	}
 });

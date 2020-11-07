@@ -1,15 +1,29 @@
-// The request is what comes after 'Feature:' in
-// someone's message in the blacc-smith channel
-//
-// For testing, we don't check what channel the 'Feature:'
-// format came from but in production, we will.
-exports.handleNewRequest = (request) => {
-	// Send request to github api
-	//const req = await postRequest(request)
-	return `New Issue: ${request.charAt(0).toUpperCase()}${request.slice(1)}`;
+const { Octokit } = require('@octokit/core');
+const { blaccSmithChannel } = require('../constants');
+
+exports.handleNewIssue = async ({ channel, issue, access_token }) => {
+	try {
+		if (channel.id === blaccSmithChannel) {
+			return await postIssue({ issue, access_token });
+		} else
+			channel.send(
+				'All feature requests must be sent to the `#blacc-smith` channel'
+			);
+	} catch (error) {
+		throw { handleNewIssue: error };
+	}
 };
 
-const postRequest = (request) => {
-	const url = 'https://api.github.com/repos/BLACC-Smith/blacc-smith/issues'
-	$.post(url, request)
+const postIssue = async ({ issue, access_token }) => {
+	const octokit = new Octokit({ auth: access_token });
+	try {
+		const { data } = await octokit.request('POST /repos/:owner/:repo/issues', {
+			owner: 'Garrett1Tolbert',
+			repo: 'blacc-smith',
+			title: issue,
+		});
+		return data.html_url;
+	} catch (error) {
+		throw { postRequest: error };
+	}
 };
