@@ -15,7 +15,8 @@ const getQuestion = async (slug) => {
 const getUsedSlugs = async () => {
 	try {
 		const snapshot = await firestore.collection('dailyCC').doc('slugs').get();
-		return snapshot.data()?.usedSlugs || [];
+		if (snapshot.exists) return snapshot.data()?.usedSlugs || [];
+		throw { getUsedSlugs: `Snapshot doesn't exist` };
 	} catch (err) {
 		throw { getUsedSlugs: err };
 	}
