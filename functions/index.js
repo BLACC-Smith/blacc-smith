@@ -1,8 +1,9 @@
 const functions = require('firebase-functions');
-const { handleDailyCC } = require('./dailyCC');
-const { discordClient } = require('./config');
+const { discordClient, discordGuilds } = require('./config');
 const { dailyccChannel, affirmationsChannel } = require('./constants');
+const { handleDailyCC } = require('./dailyCC');
 const postAffirmation = require('./affirmations');
+const { askAnonymously, getPreferredChannel, handleAFAF } = require('./afaf');
 
 exports.dailycc = functions.https.onRequest(async (req, res) => {
 	discordClient.on('ready', async () => {
@@ -38,7 +39,13 @@ exports.affirmations = functions.https.onRequest((req, res) => {
 		} catch (error) {
 			throw error;
 		}
-		console.log('POSTED: ' + question);
-		res.send(question);
 	});
+});
+
+discordClient.on('message', async (message) => {
+	try {
+		await handleAFAF(message);
+	} catch (error) {
+		throw 'Error occured while asking for a friend';
+	}
 });
