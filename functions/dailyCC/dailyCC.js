@@ -1,23 +1,23 @@
 const axios = require('axios');
 const { firestore, discordMessageEmbed } = require('../config');
 const { slugs, baseUrl, codeWarsLogo } = require('./constants');
-const { randomIndex } = require('../utilities');
+const { randomIndex, removeFromList } = require('../utilities');
 
 const getQuestion = async (slug) => {
 	try {
 		const { data } = await axios.get(`${baseUrl}/${slug}`);
 		return data;
 	} catch (err) {
-		console.log({ getQuestion: err });
+		throw { getQuestion: err };
 	}
 };
 
 const getUsedSlugs = async () => {
 	try {
 		const snapshot = await firestore.collection('dailyCC').doc('slugs').get();
-		return snapshot.data().usedSlugs || [];
+		return snapshot.data()?.usedSlugs || [];
 	} catch (err) {
-		console.log({ getUsedSlugs: err });
+		throw { getUsedSlugs: err };
 	}
 };
 
@@ -33,7 +33,7 @@ const updateFirebaseSlugs = async (slug) => {
 
 		return usedSlugs;
 	} catch (err) {
-		console.log({ updateFirebaseSlugs: err });
+		throw { updateFirebaseSlugs: err };
 	}
 };
 const embedMessage = ({ url, description, name, category, rank }) => {
@@ -56,20 +56,20 @@ const embedMessage = ({ url, description, name, category, rank }) => {
 		.setTimestamp();
 };
 
-const getUnusedSlug = async () => {
-	const usedSlugs = await getUsedSlugs();
+const getUnusedSlug = async (usedSlugs) => {
 	const slug = slugs[randomIndex(slugs.length - 1)];
 	return !usedSlugs.includes(slug) ? slug : getUnusedSlug();
 };
 
 const handleDailyCC = async () => {
 	try {
-		const slug = await getUnusedSlug();
+		const usedSlugs = await getUsedSlugs();
+		const slug = await getUnusedSlug(removeFromList(usedSlugs, slugs));
 		const question = await getQuestion(slug);
 		await updateFirebaseSlugs(slug);
 		return embedMessage(question);
 	} catch (err) {
-		console.log({ handleDailyCC: err });
+		throw { handleDailyCC: err };
 	}
 };
 
@@ -79,11 +79,12 @@ const resetDailyCCData = async () => {
 		await firestore.collection('dailyCC').doc('slugs').set(config);
 		return config;
 	} catch (err) {
-		console.log({ resetDailyCCData: err });
+		throw { resetDailyCCData: err };
 	}
 };
 
 exports.resetDailyCCData = resetDailyCCData;
 exports.updateFirebaseSlugs = updateFirebaseSlugs;
+exports.getUnusedSlug = getUnusedSlug;
 exports.getUsedSlugs = getUsedSlugs;
 exports.handleDailyCC = handleDailyCC;
