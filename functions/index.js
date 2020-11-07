@@ -1,8 +1,8 @@
 const functions = require('firebase-functions');
-const axios = require('axios');
-const { firestore, discordClient } = require('./config');
+const { discordClient } = require('./config');
 const { affirmationsChannel } = require('./constants');
 const postAffirmation = require('./affirmations');
+const { handleNewRequest } = require('./githubRequests');
 
 exports.dailycc = functions.https.onRequest(async (req, res) => {
 	const discordClient = new Discord.Client();
@@ -12,17 +12,19 @@ exports.dailycc = functions.https.onRequest(async (req, res) => {
 	discordClient.login(access_token).catch((err) => console.log(err));
 
 	discordClient.on('ready', async () => {
-		const channelId = "771821709589479505"
+		const channelId = '771821709589479505';
 		const channel = discordClient.channels.cache.get(channelId);
 
-		let question
-		try{
-			question = await handleDailyCC({channel, firestore})
+		let question;
+		try {
+			question = await handleDailyCC({ channel, firestore });
+		} catch (err) {
+			console.log('ERROR', err);
+			res.send(err);
+			return;
 		}
-		catch(err){
-			console.log('ERROR', err)
-			res.send(err)
-			return
+	});
+});
 exports.affirmations = functions.https.onRequest((req, res) => {
 	discordClient.on('ready', async () => {
 		try {
@@ -36,8 +38,15 @@ exports.affirmations = functions.https.onRequest((req, res) => {
 		} catch (error) {
 			throw error;
 		}
-		console.log('POSTED: ' + question)
-		res.send(question)
+		console.log('POSTED: ' + question);
+		res.send(question);
 	});
-	});
+});
+
+discordClient.on('message', ({ content, channel, author }) => {
+	if (author.bot) return;
+	if (content.startsWith('Feature:')) {
+		const res = handleNewRequest(content.split('Feature:')[1].trim());
+		channel.send(res);
+	}
 });
