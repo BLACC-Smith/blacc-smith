@@ -1,9 +1,9 @@
 const functions = require('firebase-functions');
-const { discordClient, discordGuilds } = require('./config');
+const { discordClient } = require('./config');
 const { dailyccChannel, affirmationsChannel } = require('./constants');
 const { handleDailyCC } = require('./dailyCC');
 const postAffirmation = require('./affirmations');
-const { askAnonymously, getPreferredChannel, handleAFAF } = require('./afaf');
+const { handleAFAF } = require('./afaf');
 
 exports.dailycc = functions.https.onRequest(async (req, res) => {
 	discordClient.on('ready', async () => {

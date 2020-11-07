@@ -1,11 +1,7 @@
 const axios = require('axios');
 const { firestore, discordMessageEmbed } = require('../config');
 const { slugs, baseUrl, codeWarsLogo } = require('./constants');
-const {
-	randomIndex,
-	removeFromList,
-	getRandomElement,
-} = require('../utilities');
+const { removeFromList, getRandomElement } = require('../utilities');
 
 const getQuestion = async (slug) => {
 	try {
