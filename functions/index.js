@@ -1,31 +1,31 @@
 const functions = require('firebase-functions');
 const { discordClient, discordGuilds } = require('./config');
-const { affirmationsChannel, blaccSmithServer } = require('./constants');
+const { dailyccChannel, affirmationsChannel } = require('./constants');
+const { handleDailyCC } = require('./dailyCC');
 const postAffirmation = require('./affirmations');
 const { askAnonymously, getPreferredChannel, handleAFAF } = require('./afaf');
 
 exports.dailycc = functions.https.onRequest(async (req, res) => {
-	const discordClient = new Discord.Client();
-	const { access_token } = functions.config().discord;
-	const firestore = admin.firestore();
-
-	discordClient.login(access_token).catch((err) => console.log(err));
-
 	discordClient.on('ready', async () => {
-		const channelId = '771821709589479505';
-		const channel = discordClient.channels.cache.get(channelId);
-
-		let question;
 		try {
-			question = await handleDailyCC({ channel, firestore });
+			const question = await handleDailyCC();
+			if (!question) {
+				res.send('Cannot retrieve data');
+				return;
+			}
+			discordClient.channels.cache
+				.get(dailyccChannel)
+				.send(question)
+				.then((msg) => {
+					msg.pin();
+					res.send(question);
+				});
 		} catch (err) {
-			console.log('ERROR', err);
-			res.send(err);
-			return;
+			console.log({ err });
+			res.send({ err });
 		}
 	});
 });
-
 exports.affirmations = functions.https.onRequest((req, res) => {
 	discordClient.on('ready', async () => {
 		try {
