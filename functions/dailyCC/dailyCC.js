@@ -1,7 +1,11 @@
 const axios = require('axios');
 const { firestore, discordMessageEmbed } = require('../config');
 const { slugs, baseUrl, codeWarsLogo } = require('./constants');
-const { randomIndex, removeFromList } = require('../utilities');
+const {
+	randomIndex,
+	removeFromList,
+	getRandomElement,
+} = require('../utilities');
 
 const getQuestion = async (slug) => {
 	try {
@@ -55,15 +59,10 @@ const embedMessage = ({ url, description, name, category, rank }) => {
 		.setTimestamp();
 };
 
-const getUnusedSlug = async (usedSlugs) => {
-	const slug = slugs[randomIndex(slugs.length - 1)];
-	return !usedSlugs.includes(slug) ? slug : getUnusedSlug();
-};
-
 const handleDailyCC = async () => {
 	try {
 		const usedSlugs = await getUsedSlugs();
-		const slug = await getUnusedSlug(removeFromList(usedSlugs, slugs));
+		const slug = getRandomElement(removeFromList(slugs, usedSlugs));
 		const question = await getQuestion(slug);
 		await updateFirebaseSlugs(slug, usedSlugs);
 		return embedMessage(question);
@@ -84,6 +83,5 @@ const resetDailyCCData = async () => {
 
 exports.resetDailyCCData = resetDailyCCData;
 exports.updateFirebaseSlugs = updateFirebaseSlugs;
-exports.getUnusedSlug = getUnusedSlug;
 exports.getUsedSlugs = getUsedSlugs;
 exports.handleDailyCC = handleDailyCC;
