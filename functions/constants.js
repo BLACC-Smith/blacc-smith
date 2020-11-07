@@ -1,3 +1,7 @@
+exports.blaccServer = '769610692297752586';
+exports.blaccSmithServer = '771819631757230091';
+exports.blaccLogo =
+	'https://pbs.twimg.com/media/EmM5XjRXEAEmAoc?format=png&name=medium';
 exports.blaccSmithLogo =
 	'https://avatars0.githubusercontent.com/u/73925140?s=200&v=4';
 exports.affirmationsChannel = '773420650744250408';
