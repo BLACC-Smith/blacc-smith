@@ -1,12 +1,35 @@
-const { discordMessageEmbed } = require('../config');
-const { blaccLogo } = require('../constants');
+const {
+	discordMessageEmbed,
+	discordGuilds,
+	discordClient,
+} = require('../config');
+const { blaccLogo, blaccSmithServer } = require('../constants');
 
-exports.askAnonymously = (question, preferredChannelId, discordClient) => {
+exports.handleAFAF = async ({ author, channel, content }) => {
+	const channels = discordGuilds.get(blaccSmithServer).channels.cache;
+	if (author.bot) return;
+	if (channel.type === 'dm' && content.toLowerCase().startsWith('ask')) {
+		const preferredChannelId = await this.getPreferredChannel({
+			author,
+			currChannel: channel,
+			serverChannels: channels,
+		});
+		this.askAnonymously({
+			question: content.slice(3).trim(),
+			preferredChannelId,
+		});
+	}
+};
+exports.askAnonymously = ({ question, preferredChannelId }) => {
 	discordClient.channels.cache
 		.get(preferredChannelId)
 		.send(embedMessage(question));
 };
-exports.getChannel = async (author, currChannel, serverChannels) => {
+exports.getPreferredChannel = async ({
+	author,
+	currChannel,
+	serverChannels,
+}) => {
 	currChannel.send('Where should your question be asked? `Ex: #general`');
 	const replies = await currChannel.awaitMessages(
 		(message) => message.author.id == author.id,

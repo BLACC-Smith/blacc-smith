@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const { discordClient, discordGuilds } = require('./config');
 const { affirmationsChannel, blaccSmithServer } = require('./constants');
 const postAffirmation = require('./affirmations');
-const { askAnonymously, getChannel } = require('./afaf');
+const { askAnonymously, getPreferredChannel, handleAFAF } = require('./afaf');
 
 exports.dailycc = functions.https.onRequest(async (req, res) => {
 	const discordClient = new Discord.Client();
@@ -39,16 +39,13 @@ exports.affirmations = functions.https.onRequest((req, res) => {
 		} catch (error) {
 			throw error;
 		}
-		console.log('POSTED: ' + question);
-		res.send(question);
 	});
 });
 
-discordClient.on('message', async ({ content, channel, author }) => {
-	const channels = discordGuilds.get(blaccSmithServer).channels.cache;
-	if (author.bot) return;
-	if (channel.type === 'dm' && content.toLowerCase().startsWith('ask')) {
-		const preferredChannelId = await getChannel(author, channel, channels);
-		askAnonymously(content.slice(3).trim(), preferredChannelId, discordClient);
+discordClient.on('message', async (message) => {
+	try {
+		await handleAFAF(message);
+	} catch (error) {
+		throw 'Error occured while asking for a friend';
 	}
 });
