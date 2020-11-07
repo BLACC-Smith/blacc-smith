@@ -1,13 +1,24 @@
-const { firestore } = require('../config');
+const { firestore, discordMessageEmbed } = require('../config');
+const { blaccSmithLogo } = require('../constants');
 const { randomIndex } = require('../utilities');
 
 module.exports = async () => {
-	const affirmations = await getAffirmation();
-	const { quote, author } = affirmations[randomIndex(affirmations.length - 1)];
-	return !author ? quote : `${quote} - ${author}`;
+	const affirmations = await getAffirmations();
+	const randomAffirmation = affirmations[randomIndex(affirmations.length - 1)];
+	return embedMessage(randomAffirmation);
 };
 
-const getAffirmation = async () => {
+const embedMessage = ({ quote, author }) => {
+	return discordMessageEmbed
+		.setColor('#fcba03')
+		.setTitle(quote)
+		.setDescription(author)
+		.setAuthor('Good Morning 🌞')
+		.setFooter('Black Coder Community ', blaccSmithLogo)
+		.setTimestamp();
+};
+
+const getAffirmations = async () => {
 	try {
 		const doc = await firestore
 			.collection('constants')
