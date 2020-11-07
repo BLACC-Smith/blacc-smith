@@ -15,18 +15,16 @@ const getQuestion = async (slug) => {
 const getUsedSlugs = async () => {
 	try {
 		const snapshot = await firestore.collection('dailyCC').doc('slugs').get();
-		if (snapshot.exists) return snapshot.data()?.usedSlugs || [];
+		if (snapshot.exists) return snapshot.data().usedSlugs;
 		throw { getUsedSlugs: `Snapshot doesn't exist` };
 	} catch (err) {
 		throw { getUsedSlugs: err };
 	}
 };
 
-const updateFirebaseSlugs = async (slug) => {
+const updateFirebaseSlugs = async (slug, usedSlugs) => {
 	try {
-		let usedSlugs = await getUsedSlugs(firestore);
 		usedSlugs.push(slug);
-
 		await firestore
 			.collection('dailyCC')
 			.doc('slugs')
@@ -67,7 +65,7 @@ const handleDailyCC = async () => {
 		const usedSlugs = await getUsedSlugs();
 		const slug = await getUnusedSlug(removeFromList(usedSlugs, slugs));
 		const question = await getQuestion(slug);
-		await updateFirebaseSlugs(slug);
+		await updateFirebaseSlugs(slug, usedSlugs);
 		return embedMessage(question);
 	} catch (err) {
 		throw { handleDailyCC: err };
