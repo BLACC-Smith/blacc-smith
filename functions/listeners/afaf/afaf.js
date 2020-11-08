@@ -2,8 +2,8 @@ const {
 	discordMessageEmbed,
 	discordGuilds,
 	discordClient,
-} = require('../config');
-const { blaccLogo, blaccSmithServer } = require('../constants');
+} = require('../../config');
+const { blaccLogo, blaccSmithServer } = require('../../constants');
 
 exports.handleAFAF = async ({ author, channel, content }) => {
 	const channels = discordGuilds.get(blaccSmithServer).channels.cache;
