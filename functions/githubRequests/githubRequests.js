@@ -22,7 +22,7 @@ const postIssue = async ({ issue, access_token }) => {
 			repo: 'blacc-smith',
 			title: issue,
 			labels: [
-				'Feature'
+				'Community Request'
 			]
 		});
 		return data.html_url;
