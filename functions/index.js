@@ -5,42 +5,49 @@ const { handleDailyCC } = require('./endpoints/dailyCC');
 const { postAffirmation } = require('./endpoints/affirmations');
 const { handleAFAF } = require('./listeners/afaf');
 
-exports.dailycc = functions.https.onRequest(async (req, res) => {
-	discordClient.on('ready', async () => {
-		try {
-			const question = await handleDailyCC();
-			if (!question) {
-				res.send('Cannot retrieve data');
-				return;
+exports.affirmations = functions.pubsub
+	.schedule('0 9 * * MON')
+	.timeZone('US/Central')
+	.onRun(() => {
+		discordClient.on('ready', async () => {
+			try {
+				const message = await postAffirmation();
+				if (!message) {
+					res.send('Cannot retrieve data');
+					return;
+				}
+				discordClient.channels.cache.get(affirmationsChannel).send(message);
+				res.send(message);
+			} catch (error) {
+				throw error;
 			}
-			discordClient.channels.cache
-				.get(dailyccChannel)
-				.send(question)
-				.then((msg) => {
-					msg.pin();
-					res.send(question);
-				});
-		} catch (err) {
-			console.log({ err });
-			res.send({ err });
-		}
+		});
 	});
-});
-exports.affirmations = functions.https.onRequest((req, res) => {
-	discordClient.on('ready', async () => {
-		try {
-			const message = await postAffirmation();
-			if (!message) {
-				res.send('Cannot retrieve data');
-				return;
+
+exports.dailycc = functions.pubsub
+	.schedule('0 9 * * *')
+	.timeZone('US/Central')
+	.onRun(() => {
+		discordClient.on('ready', async () => {
+			try {
+				const question = await handleDailyCC();
+				if (!question) {
+					res.send('Cannot retrieve data');
+					return;
+				}
+				discordClient.channels.cache
+					.get(dailyccChannel)
+					.send(question)
+					.then((msg) => {
+						msg.pin();
+						res.send(question);
+					});
+			} catch (err) {
+				console.log({ err });
+				res.send({ err });
 			}
-			discordClient.channels.cache.get(affirmationsChannel).send(message);
-			res.send(message);
-		} catch (error) {
-			throw error;
-		}
+		});
 	});
-});
 
 discordClient.on('message', async (message) => {
 	try {
