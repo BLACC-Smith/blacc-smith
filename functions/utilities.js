@@ -13,11 +13,13 @@ exports.scheduledJob = (cronJob, feature) => {
 		.schedule(cronJob)
 		.timeZone('US/Central')
 		.onRun(() => {
+			//TODO error handling optimization
 			try {
 				const { data } = axios.get(`${apiUrl}/${feature}`);
 				return data;
 			} catch (error) {
-				throw 'Cannot get affirmation';
+				console.log(error)
+				throw error
 			}
 		});
 };

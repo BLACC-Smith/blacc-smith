@@ -1,5 +1,6 @@
 const axios = require('axios');
-const { firestore, discordMessageEmbed } = require('../../config');
+const { firestore } = require('../../config');
+const { MessageEmbed } = require('discord.js');
 const { slugs, baseUrl, codeWarsLogo } = require('./constants');
 const { removeFromList, getRandomElement } = require('../../utilities');
 
@@ -36,7 +37,7 @@ const updateFirebaseSlugs = async (slug, usedSlugs) => {
 	}
 };
 const embedMessage = ({ url, description, name, category, rank }) => {
-	return discordMessageEmbed
+	return new MessageEmbed()
 		.setColor(rank.color.toUpperCase())
 		.setTitle(name)
 		.setDescription(`${description.substring(0, 500)}...`)
