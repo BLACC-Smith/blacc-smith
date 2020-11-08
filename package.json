@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Garrett1Tolbert/blacc-smith/issues"
   },
-  "homepage": "https://github.com/Garrett1Tolbert/blacc-smith#readme"
+  "homepage": "https://github.com/Garrett1Tolbert/blacc-smith#readme",
+  "dependencies": {
+    "@octokit/request": "^5.4.10"
+  }
 }

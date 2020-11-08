@@ -4,6 +4,7 @@ const { dailyccChannel, affirmationsChannel } = require('./constants');
 const { handleDailyCC } = require('./dailyCC');
 const postAffirmation = require('./affirmations');
 const { askAnonymously, getPreferredChannel, handleAFAF } = require('./afaf');
+const { access_token } = functions.config().github;
 
 exports.dailycc = functions.https.onRequest(async (req, res) => {
 	discordClient.on('ready', async () => {
@@ -42,10 +43,18 @@ exports.affirmations = functions.https.onRequest((req, res) => {
 	});
 });
 
-discordClient.on('message', async (message) => {
+discordClient.on('message', async ({ content, channel, author }) => {
+	if (author.bot) return;
 	try {
-		await handleAFAF(message);
+		if (content.toLowerCase().startsWith('feature:')) {
+			const newIssue = await handleNewIssue({
+				channel,
+				issue: content.slice(8).trim(),
+				access_token,
+			});
+			channel.send(newIssue);
+		}
 	} catch (error) {
-		throw 'Error occured while asking for a friend';
+		throw { onHandleNewIssue: error };
 	}
 });
