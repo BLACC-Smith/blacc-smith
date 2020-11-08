@@ -2,7 +2,7 @@ const { firestore, discordMessageEmbed } = require('../../config');
 const { blaccSmithLogo } = require('../../constants');
 const { randomIndex } = require('../../utilities');
 
-exports.postAffirmation = async () => {
+exports.getAffirmation = async () => {
 	const affirmations = await getAffirmations();
 	const randomAffirmation = affirmations[randomIndex(affirmations.length - 1)];
 	return embedMessage(randomAffirmation);
