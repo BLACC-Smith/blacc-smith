@@ -1,13 +1,25 @@
 const { firestore } = require('../../config');
 const { MessageEmbed } = require('discord.js');
 const { blaccSmithLogo } = require('../../constants');
-const { randomIndex } = require('../../utilities');
+const { getRandomElement } = require('../../utilities');
 
-exports.getAffirmation = async () => {
-	const affirmations = await getAffirmations();
-	const randomAffirmation = affirmations[randomIndex(affirmations.length - 1)];
-	return embedMessage(randomAffirmation);
-};
+exports.handleAffirmation = (channel)=>new Promise(async (resolve, reject)=>{
+	try {
+		const affirmations = await getAffirmations();
+		const randomAffirmation = getRandomElement(affirmations);
+		let message = embedMessage(randomAffirmation);
+
+		channel.send(message)
+		.then((message)=>{
+			resolve(message)
+		})
+		.catch((error)=>{
+			reject({ handleAffirmation: error });
+		})
+	} catch (error) {
+		reject({ handleAffirmation: error });
+	}
+});
 
 const embedMessage = ({ quote, author }) => {
 	return new MessageEmbed()
@@ -27,6 +39,6 @@ const getAffirmations = async () => {
 			.get();
 		return doc.data().affirmations;
 	} catch (error) {
-		throw error;
+		throw { getAffirmations: error };
 	}
 };
