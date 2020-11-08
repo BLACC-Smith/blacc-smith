@@ -21,6 +21,9 @@ const postIssue = async ({ issue, access_token }) => {
 			owner: 'Garrett1Tolbert',
 			repo: 'blacc-smith',
 			title: issue,
+			labels: [
+				'Feature'
+			]
 		});
 		return data.html_url;
 	} catch (error) {
