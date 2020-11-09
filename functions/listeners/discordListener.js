@@ -6,7 +6,7 @@ module.exports = () => {
 		try {
 			await handleAFAF(message);
 		} catch (error) {
-			throw 'Error occured while asking for a friend';
+			console.log({ onMessage: error });
 		}
 	});
 };
