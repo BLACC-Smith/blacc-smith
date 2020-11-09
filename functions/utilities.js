@@ -1,4 +1,5 @@
 const functions = require('firebase-functions');
+const axios = require('axios');
 const { apiUrl } = require('./constants');
 
 exports.randomIndex = (maxIndex) => Math.round(Math.random() * maxIndex);

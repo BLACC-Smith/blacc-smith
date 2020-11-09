@@ -6,5 +6,5 @@ const discordListener = require('./listeners');
 discordListener()
 
 exports.discord = functions.https.onRequest(endpointHandler);
-exports.scheduleDailyCC = scheduledJob('* * * * *', 'daily-cc');
+exports.scheduleDailyCC = scheduledJob('0 9 * * *', 'daily-cc');
 exports.scheduleAffirmations = scheduledJob('0 9 * * MON', 'affirmations');
