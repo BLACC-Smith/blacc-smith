@@ -1,9 +1,9 @@
 const functions = require('firebase-functions');
-const {scheduledJob} = require('./utilities');
+const { scheduledJob } = require('./utilities');
 const endpointHandler = require('./endpoints');
 const discordListener = require('./listeners');
 
-discordListener()
+// discordListener();
 
 exports.discord = functions.https.onRequest(endpointHandler);
 exports.scheduleDailyCC = scheduledJob('0 9 * * *', 'daily-cc');
