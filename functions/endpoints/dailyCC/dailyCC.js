@@ -1,11 +1,8 @@
 const axios = require('axios');
-const { firestore, discordMessageEmbed } = require('../config');
+const { firestore } = require('../../config');
+const { MessageEmbed } = require('discord.js');
 const { slugs, baseUrl, codeWarsLogo } = require('./constants');
-const {
-	randomIndex,
-	removeFromList,
-	getRandomElement,
-} = require('../utilities');
+const { removeFromList, getRandomElement } = require('../../utilities');
 
 const getQuestion = async (slug) => {
 	try {
@@ -40,7 +37,7 @@ const updateFirebaseSlugs = async (slug, usedSlugs) => {
 	}
 };
 const embedMessage = ({ url, description, name, category, rank }) => {
-	return discordMessageEmbed
+	return new MessageEmbed()
 		.setColor(rank.color.toUpperCase())
 		.setTitle(name)
 		.setDescription(`${description.substring(0, 500)}...`)
@@ -59,17 +56,26 @@ const embedMessage = ({ url, description, name, category, rank }) => {
 		.setTimestamp();
 };
 
-const handleDailyCC = async () => {
+const handleDailyCC = (channel)=>new Promise(async (resolve, reject)=>{
 	try {
 		const usedSlugs = await getUsedSlugs();
 		const slug = getRandomElement(removeFromList(slugs, usedSlugs));
 		const question = await getQuestion(slug);
-		await updateFirebaseSlugs(slug, usedSlugs);
-		return embedMessage(question);
+		const message = embedMessage(question);
+
+		channel.send(message)
+		.then(async (msg) => {
+			msg.pin();
+		  await updateFirebaseSlugs(slug, usedSlugs);
+			resolve(message)
+		})
+		.catch((err)=>{
+			reject({ handleDailyCC: err });
+		});
 	} catch (err) {
-		throw { handleDailyCC: err };
+		 reject({ handleDailyCC: err });
 	}
-};
+})
 
 const resetDailyCCData = async () => {
 	let config = { usedSlugs: [] };
