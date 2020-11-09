@@ -9,3 +9,4 @@ discordClient.login(access_token).catch((err) => console.log(err));
 exports.discordClient = discordClient;
 exports.discordGuilds = discordClient.guilds.cache;
 exports.discordChannels = discordClient.channels.cache;
+exports.discordMessageEmbed = new Discord.MessageEmbed();

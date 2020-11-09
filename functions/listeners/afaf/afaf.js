@@ -1,7 +1,7 @@
-const { MessageEmbed } = require('discord.js');
 const { blaccLogo, blaccSmithServer } = require('../../constants');
+const { discordMessageEmbed } = require('../config');
 
-exports.handleAFAF = async ({discordClient, discordGuilds, message}) => {
+exports.handleAFAF = async (message) => {
 	try {
 		const { author, channel, content } = message;
 		if (author.bot) return;
@@ -21,18 +21,16 @@ exports.handleAFAF = async ({discordClient, discordGuilds, message}) => {
 				channels,
 			});
 		}
-	}
-	catch(err){
-		throw ({handleAFAF: err})
+	} catch (err) {
+		throw { handleAFAF: err };
 	}
 };
 
 exports.askAnonymously = async ({ question, preferredChannel }) => {
-	try{
+	try {
 		await preferredChannel.send(embedMessage(question));
-	}
-	catch(err){
-		throw({askAnonymously: err})
+	} catch (err) {
+		throw { askAnonymously: err };
 	}
 };
 
@@ -41,38 +39,46 @@ exports.getPreferredChannel = async ({
 	currChannel,
 	serverChannels,
 }) => {
-	try{
-		await currChannel.send('Where should your question be asked? `Ex: #general`');
+	try {
+		await currChannel.send(
+			'Where should your question be asked? `Ex: #general`'
+		);
 		const replies = await currChannel.awaitMessages(
 			(message) => message.author.id == author.id,
 			{ max: 1 }
 		);
 		const reply = replies.array()[0].content;
 
-		if(reply.toLowerCase() === 'cancel'){
-			throw 'cancelled by user'
+		if (reply.toLowerCase() === 'cancel') {
+			throw 'cancelled by user';
 		}
 		if (reply.toLowerCase().startsWith('ask')) {
-			throw 'cancelled by user asking another question'
+			throw 'cancelled by user asking another question';
 		}
 
-		const channel = serverChannels.array().find((item) => item.name === reply.slice(1))
-		if(channel === undefined){
-			await currChannel.send(`Channel \`${reply}\` doesn't exist, are you sure you spelled that right?\n` +
-			`Send "cancel" without quotes to cancel.`);
-			return await this.getPreferredChannel({author, currChannel, serverChannels})
+		const channel = serverChannels
+			.array()
+			.find((item) => item.name === reply.slice(1));
+		if (channel === undefined) {
+			await currChannel.send(
+				`Channel \`${reply}\` doesn't exist, are you sure you spelled that right?\n` +
+					`Send "cancel" without quotes to cancel.`
+			);
+			return await this.getPreferredChannel({
+				author,
+				currChannel,
+				serverChannels,
+			});
+		} else {
+			return channel.id;
 		}
-		else{
-			return channel.id
-		}
-	}
-	catch(err){
-		throw({getPreferredChannel: err})
+	} catch (err) {
+		throw { getPreferredChannel: err };
 	}
 };
 
 const embedMessage = (question) => {
-	return new MessageEmbed()
+	return discordMessageEmbed
 		.setColor('#5bd64b')
 		.setTitle(question)
 		.setAuthor('Asking for a Friend')
