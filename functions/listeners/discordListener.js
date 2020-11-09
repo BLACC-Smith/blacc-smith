@@ -1,12 +1,12 @@
 const { handleAFAF } = require('./afaf');
-const { discordClient } = require('./config');
+const { discordClient, discordGuilds } = require('./config');
 
 module.exports = () => {
 	discordClient.on('message', async (message) => {
 		try {
-			await handleAFAF(message);
+			await handleAFAF({discordClient, discordGuilds, message});
 		} catch (error) {
-			throw 'Error occured while asking for a friend';
+			console.log({onMessage: error})
 		}
 	});
 };
