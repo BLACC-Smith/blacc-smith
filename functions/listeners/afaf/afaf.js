@@ -1,5 +1,5 @@
 const { blaccLogo, blaccSmithServer } = require('../../constants');
-const { discordMessageEmbed } = require('../config');
+const { discordMessageEmbed, discordGuilds } = require('../config');
 
 exports.handleAFAF = async (message) => {
 	try {
@@ -17,8 +17,6 @@ exports.handleAFAF = async (message) => {
 			await this.askAnonymously({
 				question: content.slice(3).trim(),
 				preferredChannel: channels.get(preferredChannelId),
-				discordClient,
-				channels,
 			});
 		}
 	} catch (err) {
