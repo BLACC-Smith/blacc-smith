@@ -18,7 +18,11 @@
   },
   "homepage": "https://github.com/Garrett1Tolbert/blacc-smith#readme",
   "dependencies": {
+    "@octokit/core": "^3.2.1",
     "@octokit/request": "^5.4.10",
+    "axios": "^0.21.0",
+    "discord.js": "^12.4.1",
+    "firebase-admin": "^9.4.0",
     "firebase-functions": "^3.11.0"
   }
 }
