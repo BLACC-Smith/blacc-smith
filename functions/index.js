@@ -1,3 +1,4 @@
+require('dotenv').config();
 const functions = require('firebase-functions');
 const { scheduledJob } = require('./utilities');
 const endpointHandler = require('./endpoints');

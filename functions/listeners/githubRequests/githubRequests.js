@@ -6,9 +6,7 @@ const { githubLogo } = require('./constant');
 exports.handleNewIssue = async ({ author, channel, issue, access_token }) => {
 	try {
 		if (channel.id !== blaccSmithChannel) {
-			return channel.send(
-				'All feature requests must be sent to the `#blacc-smith` channel'
-			);
+			return 'All feature requests must be sent to the `#blacc-smith` channel';
 		}
 		return await getIssue({ author, issue, access_token });
 	} catch (error) {
@@ -37,13 +35,5 @@ const embedMessage = ({ data, author }) => {
 		.setAuthor(`New Feature Request | ${author.username}`)
 		.setFooter('Github', githubLogo)
 		.setURL(data.html_url)
-		.addFields(
-			{ name: 'Issue #', value: data.number, inline: true },
-			{
-				name: 'Status',
-				value: data.state,
-				inline: true,
-			}
-		)
 		.setTimestamp();
 };
