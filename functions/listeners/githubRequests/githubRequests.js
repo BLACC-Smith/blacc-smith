@@ -6,9 +6,7 @@ const { githubLogo } = require('./constant');
 exports.handleNewIssue = async ({ author, channel, issue, access_token }) => {
 	try {
 		if (channel.id !== blaccSmithChannel) {
-			return channel.send(
-				'All feature requests must be sent to the `#blacc-smith` channel'
-			);
+			return 'All feature requests must be sent to the `#blacc-smith` channel';
 		}
 		return await getIssue({ author, issue, access_token });
 	} catch (error) {
