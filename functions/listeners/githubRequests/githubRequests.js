@@ -1,20 +1,22 @@
 const { Octokit } = require('@octokit/core');
 const { blaccSmithChannel } = require('../../constants');
+const { discordMessageEmbed } = require('../config');
+const { githubLogo } = require('./constant');
 
-exports.handleNewIssue = async ({ channel, issue, access_token }) => {
+exports.handleNewIssue = async ({ author, channel, issue, access_token }) => {
 	try {
 		if (channel.id !== blaccSmithChannel) {
 			return channel.send(
 				'All feature requests must be sent to the `#blacc-smith` channel'
 			);
 		}
-		return await postIssue({ issue, access_token });
+		return await getIssue({ author, issue, access_token });
 	} catch (error) {
 		throw { handleNewIssue: error };
 	}
 };
 
-const postIssue = async ({ issue, access_token }) => {
+const getIssue = async ({ author, issue, access_token }) => {
 	const octokit = new Octokit({ auth: access_token });
 	try {
 		const { data } = await octokit.request('POST /repos/:owner/:repo/issues', {
@@ -23,8 +25,25 @@ const postIssue = async ({ issue, access_token }) => {
 			title: issue,
 			labels: ['Community Request'],
 		});
-		return data.html_url;
+		return embedMessage({ data, author });
 	} catch (error) {
 		throw { postRequest: error };
 	}
+};
+const embedMessage = ({ data, author }) => {
+	return discordMessageEmbed
+		.setColor('#2196f3')
+		.setTitle(data.title)
+		.setAuthor(`New Feature Request | ${author.username}`)
+		.setFooter('Github', githubLogo)
+		.setURL(data.html_url)
+		.addFields(
+			{ name: 'Issue #', value: data.number, inline: true },
+			{
+				name: 'Status',
+				value: data.state,
+				inline: true,
+			}
+		)
+		.setTimestamp();
 };
