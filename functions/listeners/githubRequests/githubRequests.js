@@ -35,13 +35,5 @@ const embedMessage = ({ data, author }) => {
 		.setAuthor(`New Feature Request | ${author.username}`)
 		.setFooter('Github', githubLogo)
 		.setURL(data.html_url)
-		.addFields(
-			{ name: 'Issue #', value: data.number, inline: true },
-			{
-				name: 'Status',
-				value: data.state,
-				inline: true,
-			}
-		)
 		.setTimestamp();
 };
