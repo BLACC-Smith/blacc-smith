@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Garrett1Tolbert/blacc-smith#readme",
   "dependencies": {
-    "@octokit/request": "^5.4.10"
+    "@octokit/request": "^5.4.10",
+    "firebase-functions": "^3.11.0"
   }
 }
