@@ -3,11 +3,8 @@ const Discord = require('discord.js');
 
 const discordLoginMiddleware = (req, res, next) => {
 	const discordClient = new Discord.Client();
-	console.log({ env: process.env.NODE_ENV });
 
-	const { access_token } = functions.config().discord;
-
-	discordClient.login(access_token).catch((err) => {
+	discordClient.login(process.env.DISCORD_ACCESS_TOKEN).catch((err) => {
 		console.log(err);
 		res.status(500).send({
 			error: err.toString(),

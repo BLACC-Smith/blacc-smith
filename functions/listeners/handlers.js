@@ -1,6 +1,5 @@
 const { handleAFAF } = require('./afaf');
 const { handleNewIssue } = require('./githubRequests');
-const { functionsConfig } = require('./config');
 
 exports.handleDMs = async ({ author, channel, content }) => {
 	try {
@@ -21,7 +20,7 @@ exports.handleChannelMessages = ({ author, channel, content }) =>
 						author,
 						issue: content.slice(8).trim(),
 						channel,
-						access_token: functionsConfig.github.access_token,
+						access_token: process.env.GITHUB_ACCESS_TOKEN,
 					});
 					channel
 						.send(newIssue)
