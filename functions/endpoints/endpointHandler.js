@@ -22,4 +22,7 @@ app.use((req, res, next) => {
 	discordClient.destroy();
 });
 
+//Fixes Heroku Error R10 (Boot timeout)
+app.listen(process.env.PORT || 5000);
+
 module.exports = app;
