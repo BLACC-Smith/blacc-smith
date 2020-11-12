@@ -2,7 +2,6 @@ const functions = require('firebase-functions');
 const { scheduledJob } = require('./utilities');
 const endpointHandler = require('./endpoints');
 const discordListener = require('./listeners');
-console.log({ env: process.env.NODE_ENV });
 
 discordListener();
 
