@@ -1,24 +1,18 @@
 const { blaccLogo, blaccSmithServer } = require('../../constants');
 const { discordMessageEmbed, discordGuilds } = require('../config');
 
-exports.handleAFAF = async (message) => {
+exports.handleAFAF = async ({ author, channel, content }) => {
 	try {
-		const { author, channel, content } = message;
-		if (author.bot) return;
-
 		const channels = discordGuilds.get(blaccSmithServer).channels.cache;
-
-		if (channel.type === 'dm' && content.toLowerCase().startsWith('ask')) {
-			const preferredChannelId = await this.getPreferredChannel({
-				author,
-				currChannel: channel,
-				serverChannels: channels,
-			});
-			await this.askAnonymously({
-				question: content.slice(3).trim(),
-				preferredChannel: channels.get(preferredChannelId),
-			});
-		}
+		const preferredChannelId = await this.getPreferredChannel({
+			author,
+			currChannel: channel,
+			serverChannels: channels,
+		});
+		await this.askAnonymously({
+			question: content.slice(3).trim(),
+			preferredChannel: channels.get(preferredChannelId),
+		});
 	} catch (err) {
 		throw { handleAFAF: err };
 	}
