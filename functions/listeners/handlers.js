@@ -12,12 +12,13 @@ exports.handleDMs = async ({ author, channel, content }) => {
 		console.log({ handleDMs: error });
 	}
 };
-exports.handleChannelMessages = ({ channel, content }) =>
+exports.handleChannelMessages = ({ author, channel, content }) =>
 	new Promise(async (resolve, reject) => {
 		try {
 			switch (content.toLowerCase().split(' ')[0]) {
 				case 'feature:':
 					const newIssue = await handleNewIssue({
+						author,
 						issue: content.slice(8).trim(),
 						channel,
 						access_token: functionsConfig.github.access_token,
