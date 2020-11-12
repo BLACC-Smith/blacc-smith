@@ -1,1 +1,7 @@
 node_modules/
+
+#heroku
+/node_modules
+npm-debug.log
+.DS_Store
+/*.env
