@@ -56,26 +56,28 @@ const embedMessage = ({ url, description, name, category, rank }) => {
 		.setTimestamp();
 };
 
-const handleDailyCC = (channel)=>new Promise(async (resolve, reject)=>{
-	try {
-		const usedSlugs = await getUsedSlugs();
-		const slug = getRandomElement(removeFromList(slugs, usedSlugs));
-		const question = await getQuestion(slug);
-		const message = embedMessage(question);
+const handleDailyCC = (channel) =>
+	new Promise(async (resolve, reject) => {
+		try {
+			const usedSlugs = await getUsedSlugs();
+			const slug = getRandomElement(removeFromList(slugs, usedSlugs));
+			const question = await getQuestion(slug);
+			const message = embedMessage(question);
 
-		channel.send(message)
-		.then(async (msg) => {
-			msg.pin();
-		  await updateFirebaseSlugs(slug, usedSlugs);
-			resolve(message)
-		})
-		.catch((err)=>{
+			channel
+				.send(message)
+				.then(async (msg) => {
+					msg.pin();
+					await updateFirebaseSlugs(slug, usedSlugs);
+					resolve(message);
+				})
+				.catch((err) => {
+					reject({ handleDailyCC: err });
+				});
+		} catch (err) {
 			reject({ handleDailyCC: err });
-		});
-	} catch (err) {
-		 reject({ handleDailyCC: err });
-	}
-})
+		}
+	});
 
 const resetDailyCCData = async () => {
 	let config = { usedSlugs: [] };
