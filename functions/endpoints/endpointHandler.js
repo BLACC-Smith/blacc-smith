@@ -24,7 +24,5 @@ app.use((req, res, next) => {
 });
 
 //Fixes Heroku Error R10 (Boot timeout)
-app.listen(PORT, () => {
-	console.log(`Our app is running on port ${PORT}`);
-});
+
 module.exports = app;
