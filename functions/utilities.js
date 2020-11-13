@@ -19,8 +19,7 @@ exports.scheduledJob = (cronJob, feature) => {
 				const { data } = axios.get(`${apiUrl}/${feature}`);
 				return data;
 			} catch (error) {
-				console.log(error)
-				throw error
+				throw { scheduledJob: error };
 			}
 		});
 };
