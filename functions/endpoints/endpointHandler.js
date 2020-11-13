@@ -5,6 +5,7 @@ const { handleAffirmation } = require('./affirmations');
 const { endpointGenerator } = require('./endpointUtilities');
 const express = require('express');
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 //Setup Middleware
 app.use(discordLoginMiddleware);
@@ -23,6 +24,7 @@ app.use((req, res, next) => {
 });
 
 //Fixes Heroku Error R10 (Boot timeout)
-app.listen(process.env.PORT || 8080);
-
+app.listen(PORT, () => {
+	console.log(`Our app is running on port ${PORT}`);
+});
 module.exports = app;
