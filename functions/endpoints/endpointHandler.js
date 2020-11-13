@@ -1,5 +1,5 @@
 const { discordLoginMiddleware } = require('./middleware');
-const { dailyccChannel, affirmationsChannel } = require('../constants');
+const { generalChannel, technicalInterviewsChannel } = require('../constants');
 const { handleDailyCC } = require('./dailyCC');
 const { handleAffirmation } = require('./affirmations');
 const { endpointGenerator } = require('./endpointUtilities');
@@ -10,11 +10,11 @@ const app = express();
 app.use(discordLoginMiddleware);
 
 //Endpoints
-app.get('/daily-cc', endpointGenerator(dailyccChannel, handleDailyCC));
 app.get(
-	'/affirmations',
-	endpointGenerator(affirmationsChannel, handleAffirmation)
+	'/daily-cc',
+	endpointGenerator(technicalInterviewsChannel, handleDailyCC)
 );
+app.get('/affirmations', endpointGenerator(generalChannel, handleAffirmation));
 
 //Cleanup Middleware
 app.use((req, res, next) => {

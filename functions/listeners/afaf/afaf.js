@@ -1,9 +1,9 @@
-const { blaccLogo, blaccSmithServer } = require('../../constants');
+const { blaccLogo, blaccServer } = require('../../constants');
 const { discordMessageEmbed, discordGuilds } = require('../config');
 
 exports.handleAFAF = async ({ author, channel, content }) => {
 	try {
-		const channels = discordGuilds.get(blaccSmithServer).channels.cache;
+		const channels = discordGuilds.get(blaccServer).channels.cache;
 		const preferredChannelId = await this.getPreferredChannel({
 			author,
 			currChannel: channel,
