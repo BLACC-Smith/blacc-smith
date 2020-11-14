@@ -1,5 +1,5 @@
 const { blaccLogo, blaccServer } = require('../../constants');
-const { discordMessageEmbed, discordGuilds } = require('../config');
+const { discordMessageEmbed, discordGuilds } = require('../../config');
 
 exports.handleAFAF = async ({ author, channel, content }) => {
 	try {

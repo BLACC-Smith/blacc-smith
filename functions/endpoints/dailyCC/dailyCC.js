@@ -1,25 +1,48 @@
 const axios = require('axios');
-const { firestore } = require('../../config');
+const { firestore, discordChannels } = require('../../config');
 const { MessageEmbed } = require('discord.js');
 const { slugs, baseUrl, codeWarsLogo } = require('./constants');
 const { removeFromList, getRandomElement } = require('../../utilities');
+const { technicalInterviewsChannel } = require('../../constants');
 
+const handleDailyCC = async () => {
+	try {
+		const { slug, slugs, message } = await getDailyCC();
+		const sentMessage = await discordChannels
+			.get(technicalInterviewsChannel)
+			.send(message);
+		sentMessage.pin();
+		await updateFirebaseSlugs(slug, slugs);
+	} catch (error) {
+		throw { handleDailyCC: error };
+	}
+};
+
+const getDailyCC = async () => {
+	try {
+		const usedSlugs = await getUsedSlugs();
+		const slug = getRandomElement(removeFromList(slugs, usedSlugs));
+		const question = await getQuestion(slug);
+		return { slug, slugs: usedSlugs, message: embedMessage(question) };
+	} catch (error) {
+		throw { getDailyCC: error };
+	}
+};
+const getUsedSlugs = async () => {
+	try {
+		const snapshot = await firestore.collection('dailyCC').doc('slugs').get();
+		if (!snapshot.exists) throw `Snapshot doesn't exist`;
+		return snapshot.data().usedSlugs;
+	} catch (error) {
+		throw { getUsedSlugs: error };
+	}
+};
 const getQuestion = async (slug) => {
 	try {
 		const { data } = await axios.get(`${baseUrl}/${slug}`);
 		return data;
 	} catch (err) {
 		throw { getQuestion: err };
-	}
-};
-
-const getUsedSlugs = async () => {
-	try {
-		const snapshot = await firestore.collection('dailyCC').doc('slugs').get();
-		if (snapshot.exists) return snapshot.data().usedSlugs;
-		throw { getUsedSlugs: `Snapshot doesn't exist` };
-	} catch (err) {
-		throw { getUsedSlugs: err };
 	}
 };
 
@@ -55,29 +78,6 @@ const embedMessage = ({ url, description, name, category, rank }) => {
 		)
 		.setTimestamp();
 };
-
-const handleDailyCC = (channel) =>
-	new Promise(async (resolve, reject) => {
-		try {
-			const usedSlugs = await getUsedSlugs();
-			const slug = getRandomElement(removeFromList(slugs, usedSlugs));
-			const question = await getQuestion(slug);
-			const message = embedMessage(question);
-
-			channel
-				.send(message)
-				.then(async (msg) => {
-					msg.pin();
-					await updateFirebaseSlugs(slug, usedSlugs);
-					resolve(message);
-				})
-				.catch((err) => {
-					reject({ handleDailyCC: err });
-				});
-		} catch (err) {
-			reject({ handleDailyCC: err });
-		}
-	});
 
 const resetDailyCCData = async () => {
 	let config = { usedSlugs: [] };

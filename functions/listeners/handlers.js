@@ -1,6 +1,6 @@
 const { handleAFAF } = require('./afaf');
 const { handleNewIssue } = require('./githubRequests');
-const { functionsConfig } = require('./config');
+const { functionsConfig } = require('../config');
 
 exports.handleDMs = async ({ author, channel, content }) => {
 	try {

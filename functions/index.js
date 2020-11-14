@@ -1,11 +1,20 @@
-require('dotenv').config();
-const functions = require('firebase-functions');
 const { scheduledJob } = require('./utilities');
-const endpointHandler = require('./endpoints');
 const discordListener = require('./listeners');
+const { technicalInterviewsChannel, generalChannel } = require('./constants');
+const { handleDailyCC } = require('./endpoints/dailyCC');
+const { handleAffirmation } = require('./endpoints/affirmations');
+const { discordClient } = require('./config');
 
 discordListener();
 
-exports.discord = functions.https.onRequest(endpointHandler);
-exports.scheduleDailyCC = scheduledJob('0 9 * * *', 'daily-cc');
-exports.scheduleAffirmations = scheduledJob('0 9 * * MON', 'affirmations');
+discordClient.on('ready', () => {
+	handleDailyCC();
+});
+// exports.scheduleDailyCC = scheduledJob(
+// 	'0 9 * * *',
+// 	handleDailyCC(discordChannels.get(technicalInterviewsChannel))
+// );
+// exports.scheduleAffirmations = scheduledJob(
+// 	'0 9 * * MON',
+// 	handleAffirmation(discordChannels.get(generalChannel))
+// );

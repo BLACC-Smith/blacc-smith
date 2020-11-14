@@ -9,18 +9,15 @@ exports.getRandomElement = (list) => {
 	if (!list.length) throw { getRandomElement: 'List is empty' };
 	return list[this.randomIndex(list.length)];
 };
-exports.scheduledJob = (cronJob, feature) => {
+exports.scheduledJob = (cronJob, handler) => {
 	return functions.pubsub
 		.schedule(cronJob)
 		.timeZone('US/Central')
 		.onRun(() => {
-			//TODO error handling optimization
 			try {
-				const { data } = axios.get(`${apiUrl}/${feature}`);
-				return data;
+				handler();
 			} catch (error) {
-				console.log(error)
-				throw error
+				throw { handler: error };
 			}
 		});
 };

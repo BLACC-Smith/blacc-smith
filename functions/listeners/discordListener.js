@@ -1,4 +1,4 @@
-const { discordClient } = require('./config');
+const { discordClient } = require('../config');
 const { handleDMs, handleChannelMessages } = require('./handlers');
 
 module.exports = () => {

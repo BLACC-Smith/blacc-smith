@@ -1,6 +1,6 @@
 const { Octokit } = require('@octokit/core');
 const { blaccSmithChannel } = require('../../constants');
-const { discordMessageEmbed } = require('../config');
+const { discordMessageEmbed } = require('../../config');
 const { githubLogo } = require('./constant');
 
 exports.handleNewIssue = async ({ author, channel, issue, access_token }) => {
