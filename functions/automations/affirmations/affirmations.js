@@ -13,6 +13,7 @@ exports.handleAffirmation = async () => {
 		await discordChannels
 			.get(generalChannel)
 			.send(embedMessage(randomAffirmation));
+		return randomAffirmation;
 	} catch (error) {
 		throw { handleAffirmation: error };
 	}
