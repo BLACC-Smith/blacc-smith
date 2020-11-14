@@ -1,6 +1,5 @@
 const functions = require('firebase-functions');
-const axios = require('axios');
-const { apiUrl } = require('./constants');
+const { discordClient } = require('./config');
 
 exports.randomIndex = (maxIndex) => Math.round(Math.random() * maxIndex);
 exports.removeFromList = (list, itemsToRemove) =>
@@ -13,11 +12,10 @@ exports.scheduledJob = (cronJob, handler) => {
 	return functions.pubsub
 		.schedule(cronJob)
 		.timeZone('US/Central')
-		.onRun(() => {
-			try {
+		.onRun(async () => {
+			discordClient.on('ready', () => {
+				console.log('Client is ready');
 				handler();
-			} catch (error) {
-				throw { handler: error };
-			}
+			});
 		});
 };

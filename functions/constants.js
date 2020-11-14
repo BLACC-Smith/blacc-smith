@@ -1,4 +1,3 @@
-exports.apiUrl = 'https://us-central1-blacc-smith.cloudfunctions.net/discord';
 exports.blaccServer = '769610692297752586';
 exports.blaccSmithServer = '771819631757230091';
 exports.blaccLogo =
