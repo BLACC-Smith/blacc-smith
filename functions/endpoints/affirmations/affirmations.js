@@ -3,23 +3,25 @@ const { MessageEmbed } = require('discord.js');
 const { blaccSmithLogo } = require('../../constants');
 const { getRandomElement } = require('../../utilities');
 
-exports.handleAffirmation = (channel)=>new Promise(async (resolve, reject)=>{
-	try {
-		const affirmations = await getAffirmations();
-		const randomAffirmation = getRandomElement(affirmations);
-		let message = embedMessage(randomAffirmation);
+exports.handleAffirmation = (channel) =>
+	new Promise(async (resolve, reject) => {
+		try {
+			const affirmations = await getAffirmations();
+			const randomAffirmation = getRandomElement(affirmations);
+			let message = embedMessage(randomAffirmation);
 
-		channel.send(message)
-		.then((message)=>{
-			resolve(message)
-		})
-		.catch((error)=>{
+			channel
+				.send(message)
+				.then((message) => {
+					resolve(message);
+				})
+				.catch((error) => {
+					reject({ handleAffirmation: error });
+				});
+		} catch (error) {
 			reject({ handleAffirmation: error });
-		})
-	} catch (error) {
-		reject({ handleAffirmation: error });
-	}
-});
+		}
+	});
 
 const embedMessage = ({ quote, author }) => {
 	return new MessageEmbed()

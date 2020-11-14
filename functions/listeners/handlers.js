@@ -33,6 +33,6 @@ exports.handleChannelMessages = ({ author, channel, content }) =>
 						});
 			}
 		} catch (error) {
-			console.log({ handleChannelMessages: error });
+			reject({ handleChannelMessages: error });
 		}
 	});

@@ -41,9 +41,6 @@ exports.getPreferredChannel = async ({
 		);
 		const reply = replies.array()[0].content;
 
-		if (reply.toLowerCase() === 'cancel') {
-			throw 'cancelled by user';
-		}
 		if (reply.toLowerCase().startsWith('ask')) {
 			throw 'cancelled by user asking another question';
 		}
@@ -51,21 +48,19 @@ exports.getPreferredChannel = async ({
 		const channel = serverChannels
 			.array()
 			.find((item) => item.name === reply.slice(1));
-		if (channel === undefined) {
+		if (!channel) {
 			await currChannel.send(
-				`Channel \`${reply}\` doesn't exist, are you sure you spelled that right?\n` +
-					`Send "cancel" without quotes to cancel.`
+				`\`${reply}\` channel doesn't exist. Did you spell it correctly?`
 			);
-			return await this.getPreferredChannel({
+			return this.getPreferredChannel({
 				author,
 				currChannel,
 				serverChannels,
 			});
-		} else {
-			return channel.id;
 		}
-	} catch (err) {
-		throw { getPreferredChannel: err };
+		return channel.id;
+	} catch (error) {
+		throw { getPreferredChannel: error };
 	}
 };
 
