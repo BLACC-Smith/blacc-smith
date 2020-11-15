@@ -10,6 +10,7 @@ const handleDailyCC = async (channel) => {
 		const sentMessage = await channel.send(message);
 		sentMessage.pin();
 		await updateFirebaseSlugs(slug, slugs);
+		return message;
 	} catch (error) {
 		throw { handleDailyCC: error };
 	}

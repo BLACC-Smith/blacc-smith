@@ -1,15 +1,13 @@
 const { MessageEmbed } = require('discord.js');
-const { firestore, discordChannels } = require('../../config');
-const { blaccSmithLogo, generalChannel } = require('../../constants');
+const { firestore } = require('../../config');
+const { blaccSmithLogo } = require('../../constants');
 const { getRandomElement } = require('../../utilities');
 
-exports.handleAffirmation = async () => {
+exports.handleAffirmation = async (channel) => {
 	try {
 		const affirmations = await getAffirmations();
 		const randomAffirmation = getRandomElement(affirmations);
-		await discordChannels
-			.get(generalChannel)
-			.send(embedMessage(randomAffirmation));
+		await channel.send(embedMessage(randomAffirmation));
 		return randomAffirmation;
 	} catch (error) {
 		throw { handleAffirmation: error };
