@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const { discordClient } = require('./config');
+var schedule = require('node-schedule');
 
 exports.randomIndex = (maxIndex) => Math.round(Math.random() * maxIndex);
 exports.removeFromList = (list, itemsToRemove) =>
@@ -7,6 +8,14 @@ exports.removeFromList = (list, itemsToRemove) =>
 exports.getRandomElement = (list) => {
 	if (!list.length) throw { getRandomElement: 'List is empty' };
 	return list[this.randomIndex(list.length)];
+};
+exports.jobScheduler = (cronJob, hanler) => {
+	return schedule.scheduleJob(cronJob, () => {
+		discordClient.on('ready', () => {
+			console.log({ status: 'successful' });
+			hanler();
+		});
+	});
 };
 exports.scheduledJob = (cronJob, handler) => {
 	return functions.pubsub

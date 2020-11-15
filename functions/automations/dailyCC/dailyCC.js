@@ -1,16 +1,13 @@
 const axios = require('axios');
-const { firestore, discordChannels } = require('../../config');
+const { firestore } = require('../../config');
 const { MessageEmbed } = require('discord.js');
 const { slugs, baseUrl, codeWarsLogo } = require('./constants');
 const { removeFromList, getRandomElement } = require('../../utilities');
-const { technicalInterviewsChannel } = require('../../constants');
 
-const handleDailyCC = async () => {
+const handleDailyCC = async (channel) => {
 	try {
 		const { slug, slugs, message } = await getDailyCC();
-		const sentMessage = await discordChannels
-			.get(technicalInterviewsChannel)
-			.send(message);
+		const sentMessage = await channel.send(message);
 		sentMessage.pin();
 		await updateFirebaseSlugs(slug, slugs);
 	} catch (error) {

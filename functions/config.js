@@ -17,5 +17,4 @@ exports.firestore = admin.firestore();
 exports.discordClient = discordClient;
 exports.discordGuilds = discordClient.guilds.cache;
 exports.discordChannels = discordClient.channels.cache;
-exports.discordMessageEmbed = new Discord.MessageEmbed();
 exports.functionsConfig = functions.config();

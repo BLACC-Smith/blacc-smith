@@ -1,5 +1,6 @@
+const { MessageEmbed } = require('discord.js');
+const { discordGuilds } = require('../../config');
 const { blaccLogo, blaccServer } = require('../../constants');
-const { discordMessageEmbed, discordGuilds } = require('../../config');
 
 exports.handleAFAF = async ({ author, channel, content }) => {
 	try {
@@ -65,7 +66,7 @@ exports.getPreferredChannel = async ({
 };
 
 const embedMessage = (question) => {
-	return discordMessageEmbed
+	return new MessageEmbed()
 		.setColor('#5bd64b')
 		.setTitle(question)
 		.setAuthor('Asking for a Friend')

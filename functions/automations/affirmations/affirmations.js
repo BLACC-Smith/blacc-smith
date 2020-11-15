@@ -1,8 +1,5 @@
-const {
-	firestore,
-	discordMessageEmbed,
-	discordChannels,
-} = require('../../config');
+const { MessageEmbed } = require('discord.js');
+const { firestore, discordChannels } = require('../../config');
 const { blaccSmithLogo, generalChannel } = require('../../constants');
 const { getRandomElement } = require('../../utilities');
 
@@ -20,7 +17,7 @@ exports.handleAffirmation = async () => {
 };
 
 const embedMessage = ({ quote, author }) => {
-	return discordMessageEmbed
+	return new MessageEmbed()
 		.setColor('#fcba03')
 		.setTitle(quote)
 		.setDescription(author)
