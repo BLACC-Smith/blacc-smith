@@ -1,6 +1,6 @@
 const functions = require('firebase-functions');
-const { discordClient } = require('./config');
-var schedule = require('node-schedule');
+const axios = require('axios');
+const { apiUrl } = require('./constants');
 
 exports.randomIndex = (maxIndex) => Math.round(Math.random() * maxIndex);
 exports.removeFromList = (list, itemsToRemove) =>
@@ -9,22 +9,16 @@ exports.getRandomElement = (list) => {
 	if (!list.length) throw { getRandomElement: 'List is empty' };
 	return list[this.randomIndex(list.length)];
 };
-exports.jobScheduler = (cronJob, hanler) => {
-	return schedule.scheduleJob(cronJob, () => {
-		discordClient.on('ready', () => {
-			console.log({ status: 'successful' });
-			hanler();
-		});
-	});
-};
-exports.scheduledJob = (cronJob, handler) => {
+exports.scheduledJob = (cronJob, feature) => {
 	return functions.pubsub
 		.schedule(cronJob)
 		.timeZone('US/Central')
-		.onRun(async () => {
-			discordClient.on('ready', () => {
-				console.log('Client is ready');
-				handler();
-			});
+		.onRun(() => {
+			try {
+				const { data } = axios.get(`${apiUrl}/${feature}`);
+				return data;
+			} catch (error) {
+				throw { [`scheduledJob-${feature}`]: error };
+			}
 		});
 };
