@@ -2,24 +2,38 @@ const { MessageEmbed } = require('discord.js');
 const { discordGuilds } = require('../../config');
 const { blaccLogo, blaccServer } = require('../../constants');
 
+/**
+ * @param {object} message - the message that was sent in Discord
+ * @property {object} author - the creator of the message that was sent
+ * @property {object} channel - the channel the message was sent in
+ * @property {string} content - the message content itself
+ *
+ * @description Handles the asking for a friend functionality.
+ */
 exports.handleAFAF = async ({ author, channel, content }) => {
 	try {
 		const channels = discordGuilds.get(blaccServer).channels.cache;
-		const preferredChannelId = await this.getPreferredChannel({
+		const preferredChannelId = await this.getPreferredChannel(
 			author,
-			currChannel: channel,
-			serverChannels: channels,
-		});
-		await this.askAnonymously({
-			question: content.slice(3).trim(),
-			preferredChannel: channels.get(preferredChannelId),
-		});
+			channel,
+			channels
+		);
+		await this.askAnonymously(
+			content.slice(3).trim(),
+			channels.get(preferredChannelId)
+		);
 	} catch (err) {
 		throw { handleAFAF: err };
 	}
 };
 
-exports.askAnonymously = async ({ question, preferredChannel }) => {
+/**
+ * @param {string} question - the question to be asked
+ * @param {object} preferredChannel - where the question should be posted
+ *
+ * @description Sends question to the preferred channel.
+ */
+exports.askAnonymously = async (question, preferredChannel) => {
 	try {
 		await preferredChannel.send(embedMessage(question));
 	} catch (err) {
@@ -27,11 +41,15 @@ exports.askAnonymously = async ({ question, preferredChannel }) => {
 	}
 };
 
-exports.getPreferredChannel = async ({
-	author,
-	currChannel,
-	serverChannels,
-}) => {
+/**
+ * @param {object} author - whoever DM'd the bot
+ * @param {object} currChannel - the channel the DM was sent to
+ * @param {object} serverChannels - all the channels in the server
+ *
+ * @description Asks user which channel they want their questions to
+ * be posted in.
+ */
+exports.getPreferredChannel = async (author, currChannel, serverChannels) => {
 	try {
 		await currChannel.send(
 			'Where should your question be asked? `Ex: #general`'
@@ -65,6 +83,11 @@ exports.getPreferredChannel = async ({
 	}
 };
 
+/**
+ * @param {string} question - question to be asked
+ *
+ * @description Returns question as an embedded message.
+ */
 const embedMessage = (question) => {
 	return new MessageEmbed()
 		.setColor('#5bd64b')

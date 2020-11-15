@@ -3,6 +3,11 @@ const discordListener = require('./listeners');
 const { scheduledJob } = require('./utilities');
 const endpointHandler = require('./automations');
 
+/**
+ * @description The discordListener listens to different messages
+ * from the BLACC server and handles DMs and regular
+ * messages differently.
+ */
 discordListener();
 
 exports.discord = functions.https.onRequest(endpointHandler);
