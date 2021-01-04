@@ -1,6 +1,6 @@
 const { Octokit } = require('@octokit/core');
+const { MessageEmbed } = require('discord.js');
 const { blaccSmithChannel } = require('../../constants');
-const { discordMessageEmbed } = require('../config');
 const { githubLogo } = require('./constant');
 
 exports.handleNewIssue = async ({ author, channel, issue, access_token }) => {
@@ -29,7 +29,7 @@ const getIssue = async ({ author, issue, access_token }) => {
 	}
 };
 const embedMessage = ({ data, author }) => {
-	return discordMessageEmbed
+	return new MessageEmbed()
 		.setColor('#2196f3')
 		.setTitle(data.title)
 		.setAuthor(`New Feature Request | ${author.username}`)

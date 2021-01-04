@@ -1,25 +1,18 @@
-const { firestore } = require('../../config');
 const { MessageEmbed } = require('discord.js');
+const { firestore } = require('../../config');
 const { blaccSmithLogo } = require('../../constants');
 const { getRandomElement } = require('../../utilities');
 
-exports.handleAffirmation = (channel)=>new Promise(async (resolve, reject)=>{
+exports.handleAffirmation = async (channel) => {
 	try {
 		const affirmations = await getAffirmations();
 		const randomAffirmation = getRandomElement(affirmations);
-		let message = embedMessage(randomAffirmation);
-
-		channel.send(message)
-		.then((message)=>{
-			resolve(message)
-		})
-		.catch((error)=>{
-			reject({ handleAffirmation: error });
-		})
+		await channel.send(embedMessage(randomAffirmation));
+		return randomAffirmation;
 	} catch (error) {
-		reject({ handleAffirmation: error });
+		throw { handleAffirmation: error };
 	}
-});
+};
 
 const embedMessage = ({ quote, author }) => {
 	return new MessageEmbed()
@@ -33,11 +26,12 @@ const embedMessage = ({ quote, author }) => {
 
 const getAffirmations = async () => {
 	try {
-		const doc = await firestore
+		const snapshot = await firestore
 			.collection('constants')
 			.doc('affirmations')
 			.get();
-		return doc.data().affirmations;
+		if (!snapshot.exists) throw `Snapshot doesn't exist`;
+		return snapshot.data().affirmations;
 	} catch (error) {
 		throw { getAffirmations: error };
 	}
