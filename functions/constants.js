@@ -4,6 +4,7 @@ exports.blaccSmithServer = '771819631757230091';
 exports.blaccLogo =
 	'https://pbs.twimg.com/media/EmM5XjRXEAEmAoc?format=png&name=medium';
 exports.dailyccChannel = '774024031380439091';
+exports.moderatorsChannel = '769625189645811784';
 exports.affirmationsChannel = '773420650744250408';
 exports.testBlaccSmithChannel = '774763129195331646';
 exports.blaccSmithLogo =
