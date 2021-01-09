@@ -3,7 +3,6 @@ const {
 	generalChannel,
 	technicalInterviewsChannel,
 	moderatorsChannel,
-	youtubeUploaderChannel,
 } = require('../constants');
 const { handleDailyCC } = require('./dailyCC');
 const { handleAffirmation } = require('./affirmations');
@@ -23,7 +22,7 @@ app.get(
 app.get('/affirmations', endpointGenerator(generalChannel, handleAffirmation));
 app.get(
 	'/youtube-submission',
-	endpointGenerator(youtubeUploaderChannel, handleYoutubeSubmission)
+	endpointGenerator(moderatorsChannel, handleYoutubeSubmission)
 );
 
 //Cleanup Middleware

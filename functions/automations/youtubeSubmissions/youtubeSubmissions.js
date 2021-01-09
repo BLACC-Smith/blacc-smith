@@ -21,10 +21,6 @@ exports.storageHandler = () =>
 	});
 exports.handleYoutubeSubmission = async (channel, metadata) => {
 	try {
-		const channel = discordGuilds
-			.get(blaccSmithServer)
-			.channels.cache.get(youtubeUploaderChannel);
-
 		await channel.send(embedMessage(metadata));
 		console.log('Alerted moderators');
 	} catch (error) {
