@@ -13,3 +13,4 @@ exports.affirmationsChannel = '773420650744250408';
 exports.technicalInterviewsChannel = '770116131435315220';
 exports.generalChannel = '769610693057052676';
 exports.blaccSmithChannel = '776596642324807760';
+exports.youtubeUploaderChannel = '797131390851612673';

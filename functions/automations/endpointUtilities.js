@@ -1,9 +1,9 @@
 exports.endpointGenerator = (channelKey, handler) => {
 	return (req, res, next) => {
-		let { discordChannels } = req;
-		let channel = discordChannels.get(channelKey);
+		const { discordChannels, query } = req;
+		const channel = discordChannels.get(channelKey);
 
-		handler(channel)
+		handler(channel, { ...query })
 			.then((result) => {
 				res.send(result);
 			})
